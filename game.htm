@@ -1,0 +1,538 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html lang="ua">
+<head>
+    <title>AlterTanks - ВХРЮК-Танкові Бої від Shlappy.App! 💥🐸</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="keywords" content="AlterTanks, World of Tanks, HTML5, гра, танки, Web 1.0, Shlappy, ВХРЮК, абсурд">
+    <meta name="description" content="Абсурдний HTML5 аналог старих танкових боїв у стилі Web 1.0 від Shlappy.App. КВА-КВА! ЖОРСТКО!">
+    <meta name="author" content="Шляпний Архітектор Цифрового Безладу">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style type="text/css">
+        /* Визначення змінних для кольорів - ТОЧНО ЯК НА СКРІНШОТІ */
+        :root {
+            --bg-color: #000000; /* Абсолютно чорний фон */
+            --main-text-color: #00FF00; /* Яскраво-зелений для основного тексту */
+            --header-color: #FFFF00; /* Жовтий для заголовків */
+            --link-color: #00FFFF; /* Бірюзовий для посилань */
+            --border-color: #00FF00; /* Зелена рамка */
+            --terminal-bg: #000000; /* Чорний фон термінала */
+            --input-text-color: #00FF00; /* Зелений для тексту термінала */
+            --button-bg: #006400; /* Темно-зелений для кнопок */
+            --button-text: #FFFFFF; /* Білий текст на кнопках */
+            --button-hover-bg: #00AA00; /* Світліший зелений при наведенні */
+            --button-hover-text: #FFFF00; /* Жовтий текст при наведенні на кнопку */
+            --scroll-thumb: #00FF00; /* Зелений скролбар */
+            --scroll-track: #333333; /* Темний трек скролбару */
+            --neon-glow-main: 0 0 5px rgba(0, 255, 0, 0.7), 0 0 10px rgba(0, 255, 0, 0.5), 0 0 15px rgba(0, 255, 0, 0.3); /* Зелене світіння */
+            --neon-glow-header: 0 0 5px rgba(255, 255, 0, 0.7), 0 0 10px rgba(255, 255, 0, 0.5); /* Жовте світіння для заголовків */
+            --neon-glow-link: 0 0 3px rgba(0, 255, 255, 0.7), 0 0 7px rgba(0, 255, 255, 0.5); /* Бірюзове світіння для посилань */
+            --neon-glow-pink: 0 0 3px rgba(255, 0, 255, 0.7), 0 0 7px rgba(255, 0, 255, 0.5); /* Рожеве світіння */
+            --tank-player-color: #00AA00; /* Зелений для танка гравця */
+            --tank-enemy-color: #FF0000; /* Червоний для ворожого танка */
+            --bullet-color: #FFFF00; /* Жовтий для снарядів */
+            --health-bar-full: #00FF00; /* Зелений для повного здоров'я */
+            --health-bar-empty: #FF0000; /* Червоний для порожнього здоров'я */
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--main-text-color);
+            font-family: 'Courier New', Courier, monospace;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+            line-height: 1.4;
+            text-shadow: 0 0 1px var(--main-text-color);
+        }
+
+        .game-wrapper {
+            max-width: 820px; /* Для Canvas 800px + паддінг */
+            width: 100%;
+            border: 2px dashed var(--border-color);
+            padding: 20px;
+            background-color: rgba(0, 0, 0, 0.8);
+            box-shadow: var(--neon-glow-main);
+            text-align: center;
+        }
+
+        h1 {
+            color: var(--header-color);
+            text-align: center;
+            margin-bottom: 20px;
+            text-shadow: var(--neon-glow-header);
+            font-size: 2.5em;
+            font-weight: normal;
+        }
+
+        canvas {
+            background-color: #1a1a1a; /* Темний фон для поля бою */
+            border: 1px solid var(--border-color);
+            display: block;
+            margin: 0 auto 20px auto;
+            box-shadow: var(--neon-glow-main);
+        }
+
+        .game-info {
+            margin-bottom: 20px;
+            font-size: 1.1em;
+            color: var(--link-color);
+            text-shadow: var(--neon-glow-link);
+        }
+
+        .controls-info {
+            font-size: 0.9em;
+            margin-bottom: 20px;
+            color: #AAAAAA;
+        }
+
+        button {
+            background-color: var(--button-bg);
+            color: var(--button-text);
+            border: 2px dashed var(--button-hover-bg);
+            padding: 12px 25px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s ease-in-out;
+            margin: 8px;
+            box-shadow: 0 0 5px rgba(0, 255, 0, 0.5);
+            font-family: 'Courier New', Courier, monospace;
+        }
+        button:hover {
+            background-color: var(--button-hover-bg);
+            color: var(--button-hover-text);
+            border-color: #FFFF00;
+            box-shadow: 0 0 10px rgba(255, 255, 0, 0.7);
+        }
+
+        #game-message {
+            margin-top: 25px;
+            padding: 15px;
+            border: 1px dashed var(--neon-glow-pink);
+            background-color: rgba(0, 0, 0, 0.7);
+            min-height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2em;
+            color: var(--neon-glow-pink);
+            text-shadow: var(--neon-glow-pink);
+        }
+
+        .footer-text {
+            margin-top: 40px;
+            font-size: 0.85em;
+            color: #AAAAAA;
+            text-align: center;
+            text-shadow: 0 0 1px #AAAAAA;
+        }
+
+        /* Стилі для танків та снарядів - прості прямокутники */
+        .tank-player, .tank-enemy {
+            background-color: var(--tank-player-color);
+            position: absolute;
+            width: 40px;
+            height: 40px;
+        }
+        .tank-enemy {
+            background-color: var(--tank-enemy-color);
+        }
+        .bullet {
+            background-color: var(--bullet-color);
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="game-wrapper">
+        <h1>AlterTanks: ВХРЮК-Бойові Машини! 💥</h1>
+        <p class="game-info">
+            ВІТАЄМО в арені **АБСУРДНОГО ТАНКОВОГО БОЮ**! Знищ ворожих ботів, перш ніж вони розплавлять твій процесор!
+            КВА-КВА!
+        </p>
+        <p class="controls-info">
+            Керування: <span style="color: yellow;">W A S D</span> або <span style="color: yellow;">СТРІЛКИ</span> для руху.
+            Наведіть <span style="color: yellow;">КУРСОР МИШІ</span> для прицілювання.
+            <span style="color: yellow;">ЛІВА КЛАВІША МИШІ</span> для пострілу. ЖОРСТКО!
+        </p>
+
+        <canvas id="gameCanvas" width="800" height="600"></canvas>
+
+        <div id="game-message">Натисніть "Почати ВХРЮК-Бій!", щоб розпочати свій шлях до ВЕНОМЕНАЛЬНОСТІ!</div>
+        <button onclick="startGame()">Почати ВХРЮК-Бій! 🚀</button>
+    </div>
+
+    <p class="footer-text">
+        © 2025 Shlappy Ігри: AlterTanks. Усі віртуальні права зарезервовано. Розроблено на геймерських ПК.
+    </p>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const gameMessage = document.getElementById('game-message');
+
+        let player;
+        let enemies = [];
+        let bullets = [];
+        let walls = [];
+        let gameActive = false;
+        let score = 0;
+        let mouseX = 0;
+        let mouseY = 0;
+        let keys = {}; // Для відслідковування натиснутих клавіш
+
+        const TILE_SIZE = 40; // Розмір клітинки для танків/стін
+
+        // Клас для танка (гравець або ворог)
+        class Tank {
+            constructor(x, y, color, isPlayer = false) {
+                this.x = x;
+                this.y = y;
+                this.size = TILE_SIZE;
+                this.color = color;
+                this.angle = 0; // Напрямок танка
+                this.turretAngle = 0; // Напрямок гармати
+                this.speed = 2;
+                this.health = 100;
+                this.maxHealth = 100;
+                this.reloadTime = 60; // Кадри між пострілами
+                this.currentReload = 0;
+                this.isPlayer = isPlayer;
+                this.alive = true;
+            }
+
+            draw() {
+                if (!this.alive) return;
+
+                ctx.save();
+                ctx.translate(this.x + this.size / 2, this.y + this.size / 2); // Центр обертання
+                ctx.rotate(this.angle); // Обертаємо тіло танка
+                ctx.fillStyle = this.color;
+                ctx.fillRect(-this.size / 2, -this.size / 2, this.size, this.size); // Тіло танка
+
+                // Гармата (прямокутник на танку)
+                ctx.fillStyle = '#AAAAAA'; // Сіра гармата
+                ctx.fillRect(-this.size / 4, -this.size / 2 - 10, this.size / 2, this.size / 2 + 10); // Гармата
+                ctx.restore();
+
+                // Health bar
+                ctx.fillStyle = var_to_css_val('--health-bar-empty');
+                ctx.fillRect(this.x, this.y - 10, this.size, 5);
+                ctx.fillStyle = var_to_css_val('--health-bar-full');
+                ctx.fillRect(this.x, this.y - 10, this.size * (this.health / this.maxHealth), 5);
+            }
+
+            // Оновлення для ворожого танка (просте AI)
+            update(player) {
+                if (!this.alive) return;
+
+                // Рух до гравця або випадковий рух
+                if (Math.random() < 0.02) { // 2% шанс змінити напрямок
+                    this.angle = Math.random() * Math.PI * 2;
+                }
+                this.x += Math.cos(this.angle) * this.speed * 0.5; // Вороги повільніші
+                this.y += Math.sin(this.angle) * this.speed * 0.5;
+
+                // Тримаємо ворога в межах карти
+                this.x = Math.max(0, Math.min(canvas.width - this.size, this.x));
+                this.y = Math.max(0, Math.min(canvas.height - this.size, this.y));
+
+                // Прицілювання на гравця
+                const dx = player.x - this.x;
+                const dy = player.y - this.y;
+                this.turretAngle = Math.atan2(dy, dx); // Гармата ворога дивиться на гравця
+
+                // Стрільба
+                this.currentReload++;
+                if (this.currentReload >= this.reloadTime && Math.random() < 0.01) { // 1% шанс вистрілити
+                    this.shoot();
+                    this.currentReload = 0;
+                }
+            }
+
+            // Метод для пострілу
+            shoot() {
+                if (!this.alive) return;
+                const bulletSpeed = 7;
+                const bulletX = this.x + this.size / 2 + Math.cos(this.turretAngle) * (this.size / 2 + 5);
+                const bulletY = this.y + this.size / 2 + Math.sin(this.turretAngle) * (this.size / 2 + 5);
+                bullets.push(new Bullet(bulletX, bulletY, this.turretAngle, bulletSpeed, this.isPlayer));
+            }
+
+            takeDamage(amount) {
+                this.health -= amount;
+                if (this.health <= 0) {
+                    this.health = 0;
+                    this.alive = false;
+                }
+            }
+        }
+
+        // Клас для снаряду
+        class Bullet {
+            constructor(x, y, angle, speed, fromPlayer) {
+                this.x = x;
+                this.y = y;
+                this.size = 8;
+                this.angle = angle;
+                this.speed = speed;
+                this.fromPlayer = fromPlayer; // Чий снаряд (гравця чи ворога)
+                this.active = true;
+                this.damage = 20; // Урон від снаряду
+            }
+
+            draw() {
+                if (!this.active) return;
+                ctx.fillStyle = var_to_css_val('--bullet-color');
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size / 2, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            update() {
+                if (!this.active) return;
+                this.x += Math.cos(this.angle) * this.speed;
+                this.y += Math.sin(this.angle) * this.speed;
+
+                // Перевірка виходу за межі карти
+                if (this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height) {
+                    this.active = false;
+                }
+            }
+        }
+
+        // Клас для стіни (перешкоди)
+        class Wall {
+            constructor(x, y, width, height) {
+                this.x = x;
+                this.y = y;
+                this.width = width;
+                this.height = height;
+                this.color = '#8B4513'; // Коричневий для стін, як старі танки
+            }
+
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.fillRect(this.x, this.y, this.width, this.height);
+            }
+        }
+
+        // Функція для отримання CSS-змінних
+        function var_to_css_val(variableName) {
+            return getComputedStyle(document.documentElement).getPropertyValue(variableName);
+        }
+
+        // --- Ініціалізація та Логіка Гри ---
+        function startGame() {
+            player = new Tank(canvas.width / 2 - TILE_SIZE / 2, canvas.height / 2 - TILE_SIZE / 2, var_to_css_val('--tank-player-color'), true);
+            enemies = [];
+            bullets = [];
+            walls = [];
+            score = 0;
+            gameActive = true;
+            gameMessage.textContent = 'БОЙ РОЗПОЧАТО! ЗНИЩУЙ ВОРОГІВ! КВА-КВА!';
+
+            // Створення ворогів
+            for (let i = 0; i < 3; i++) {
+                enemies.push(new Tank(
+                    Math.random() * (canvas.width - TILE_SIZE),
+                    Math.random() * (canvas.height - TILE_SIZE),
+                    var_to_css_val('--tank-enemy-color')
+                ));
+            }
+
+            // Створення стін (прості перешкоди)
+            walls.push(new Wall(100, 100, 80, 80));
+            walls.push(new Wall(canvas.width - 180, 100, 80, 80));
+            walls.push(new Wall(100, canvas.height - 180, 80, 80));
+            walls.push(new Wall(canvas.width - 180, canvas.height - 180, 80, 80));
+            walls.push(new Wall(canvas.width / 2 - 40, canvas.height / 2 - 40, 80, 80));
+
+            gameLoop();
+        }
+
+        // --- Обробка вводу ---
+        document.addEventListener('keydown', (e) => {
+            keys[e.key] = true;
+        });
+
+        document.addEventListener('keyup', (e) => {
+            keys[e.key] = false;
+        });
+
+        canvas.addEventListener('mousemove', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            mouseX = e.clientX - rect.left;
+            mouseY = e.clientY - rect.top;
+        });
+
+        canvas.addEventListener('mousedown', (e) => {
+            if (e.button === 0 && gameActive) { // Ліва клавіша миші
+                player.shoot();
+            }
+        });
+
+        // --- Ігрова петля ---
+        function gameLoop() {
+            if (!gameActive) return;
+
+            update();
+            draw();
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        function update() {
+            // Оновлення гравця
+            if (player.alive) {
+                let dx = 0;
+                let dy = 0;
+
+                // Рух
+                if (keys['w'] || keys['W'] || keys['ArrowUp']) dy -= player.speed;
+                if (keys['s'] || keys['S'] || keys['ArrowDown']) dy += player.speed;
+                if (keys['a'] || keys['A'] || keys['ArrowLeft']) dx -= player.speed;
+                if (keys['d'] || keys['D'] || keys['ArrowRight']) dx += player.speed;
+
+                // Оновлення позиції танка
+                player.x += dx;
+                player.y += dy;
+
+                // Тримаємо гравця в межах карти
+                player.x = Math.max(0, Math.min(canvas.width - player.size, player.x));
+                player.y = Math.max(0, Math.min(canvas.height - player.size, player.y));
+
+                // Прицілювання гармати на курсор миші
+                player.turretAngle = Math.atan2(mouseY - (player.y + player.size / 2), mouseX - (player.x + player.size / 2));
+            }
+
+
+            // Оновлення ворогів
+            enemies.forEach(enemy => enemy.update(player));
+            enemies = enemies.filter(enemy => enemy.alive); // Видаляємо мертвих ворогів
+
+            // Оновлення снарядів
+            bullets.forEach(bullet => bullet.update());
+            bullets = bullets.filter(bullet => bullet.active); // Видаляємо неактивні снаряди
+
+            // --- Колізії ---
+            // Снаряди з танками
+            bullets.forEach(bullet => {
+                if (!bullet.active) return;
+
+                // Снаряди гравця vs вороги
+                if (bullet.fromPlayer) {
+                    enemies.forEach(enemy => {
+                        if (enemy.alive && checkCollision(bullet, enemy)) {
+                            enemy.takeDamage(bullet.damage);
+                            bullet.active = false;
+                            gameMessage.textContent = `ВХРЮК! Ворожий танк отримав ${bullet.damage} урону! У нього ${enemy.health} HP!`;
+                            if (!enemy.alive) {
+                                score += 100;
+                                gameMessage.textContent = `ФЕНАМЕНАЛЬНО! Ворожий танк знищено! +100 ВХРЮК-ОЧОК! Всього: ${score}!`;
+                            }
+                        }
+                    });
+                } else { // Снаряди ворога vs гравець
+                    if (player.alive && checkCollision(bullet, player)) {
+                        player.takeDamage(bullet.damage);
+                        bullet.active = false;
+                        gameMessage.textContent = `ЖОРСТКО! Твій танк отримав ${bullet.damage} урону! Залишилось ${player.health} HP!`;
+                        if (!player.alive) {
+                            gameMessage.textContent = `КІНЕЦЬ ХАОСУ! Твій танк знищено! Ти програв з ${score} очками! КВА-КВА! 💀`;
+                            gameOver();
+                        }
+                    }
+                }
+            });
+
+            // Снаряди зі стінами
+            bullets.forEach(bullet => {
+                walls.forEach(wall => {
+                    if (bullet.active && checkCollision(bullet, wall)) {
+                        bullet.active = false;
+                    }
+                });
+            });
+
+            // Перемога
+            if (enemies.length === 0 && gameActive) {
+                gameMessage.textContent = `ПЕРЕМОГА! Ти знищив всіх ВХРЮК-ворогів! Твій рахунок: ${score}! 🏆`;
+                gameOver();
+            }
+        }
+
+        // Проста перевірка зіткнень (AABB - Axis-Aligned Bounding Box)
+        function checkCollision(obj1, obj2) {
+            // Для снарядів (коло) та танків/стін (прямокутник)
+            if (obj1 instanceof Bullet) {
+                // Перевірка зіткнення кола з прямокутником
+                const circleX = obj1.x;
+                const circleY = obj1.y;
+                const circleRadius = obj1.size / 2;
+
+                const rectX = obj2.x;
+                const rectY = obj2.y;
+                const rectWidth = obj2.width || obj2.size; // obj2.size для танків
+                const rectHeight = obj2.height || obj2.size; // obj2.size для танків
+
+                let testX = circleX;
+                let testY = circleY;
+
+                if (circleX < rectX) testX = rectX;
+                else if (circleX > rectX + rectWidth) testX = rectX + rectWidth;
+                if (circleY < rectY) testY = rectY;
+                else if (circleY > rectY + rectHeight) testY = rectY + rectHeight;
+
+                const distX = circleX - testX;
+                const distY = circleY - testY;
+                const distance = Math.sqrt((distX * distX) + (distY * distY));
+
+                return distance <= circleRadius;
+            } else {
+                // Це не має траплятися, але якщо потрібно зіткнення прямокутника з прямокутником
+                return obj1.x < obj2.x + (obj2.width || obj2.size) &&
+                       obj1.x + (obj1.width || obj1.size) > obj2.x &&
+                       obj1.y < obj2.y + (obj2.height || obj2.size) &&
+                       obj1.y + (obj1.height || obj1.size) > obj2.y;
+            }
+        }
+
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height); // Очистка canvas
+
+            // Малюємо стіни
+            walls.forEach(wall => wall.draw());
+
+            // Малюємо ворогів
+            enemies.forEach(enemy => enemy.draw());
+
+            // Малюємо гравця
+            if (player.alive) {
+                player.draw();
+            }
+
+            // Малюємо снаряди
+            bullets.forEach(bullet => bullet.draw());
+        }
+
+        function gameOver() {
+            gameActive = false;
+            // Додаткові абсурдні повідомлення або ефекти можуть бути додані тут!
+        }
+
+        // Початковий виклик, щоб показати повідомлення на старті
+        // startGame(); // Закоментуємо, щоб гра стартувала по кнопці
+    </script>
+
+</body>
+</html>
